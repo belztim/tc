@@ -166,15 +166,55 @@ fetch('data.json')
         return;
       }
 
+      let total = 0;
+
       keys.forEach(key => {
         const item = cart[key];
-        const description = (item['description'] || item['Description'] || 'Unnamed item').slice(0, 20);
+        const desc = (item['description'] || item['Description'] || 'Unnamed item').slice(0, 20) + '...';
+        const cost = parseFloat(item['price'] || item['Price'] || 0);
+        total += cost;
+
         const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
         div.style.borderBottom = '1px solid #ddd';
         div.style.padding = '5px 0';
-        div.innerText = description;
+
+        const left = document.createElement('span');
+        left.innerText = desc;
+
+        const right = document.createElement('div');
+        right.style.display = 'flex';
+        right.style.alignItems = 'center';
+        right.innerHTML = `<span style="margin-right: 10px;">$${cost.toFixed(2)}</span>`;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerText = '✖';
+        removeBtn.style.background = 'none';
+        removeBtn.style.border = 'none';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.color = 'red';
+        removeBtn.title = 'Remove';
+
+        removeBtn.onclick = () => {
+          delete cart[key];
+          renderCart();
+          updateCartCount();
+        };
+
+        right.appendChild(removeBtn);
+        div.appendChild(left);
+        div.appendChild(right);
         cartPopup.appendChild(div);
       });
+
+      const totalDiv = document.createElement('div');
+      totalDiv.style.marginTop = '10px';
+      totalDiv.style.fontWeight = 'bold';
+      totalDiv.style.textAlign = 'right';
+      totalDiv.innerText = `Total: $${total.toFixed(2)}`;
+      cartPopup.appendChild(totalDiv);
     }
 
     function updateCartCount() {
