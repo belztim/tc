@@ -51,8 +51,8 @@ fetch('data.json')
       addBtn.style.cursor = 'pointer';
       addBtn.onclick = () => {
         const item = {
-          description: row['description'] || 'n/a',
-          price: parseFloat(row['price'] || 0),
+          description: row['Description'] || 'n/a',
+          price: parseFloat(row['Price'] || 0),
           quantity: 1
         };
         const existing = cart.find(i => i.description === item.description);
