@@ -8,14 +8,15 @@ fetch('data.json')
     cartBox.id = 'cart-box';
     cartBox.style.display = 'none';
     cartBox.style.position = 'fixed';
-    cartBox.style.top = '80px';
+    cartBox.style.top = '60px';
     cartBox.style.right = '20px';
     cartBox.style.width = '300px';
-    cartBox.style.background = 'white';
+    cartBox.style.maxHeight = '400px';
+    cartBox.style.overflowY = 'auto';
+    cartBox.style.backgroundColor = 'white';
     cartBox.style.border = '1px solid #ccc';
     cartBox.style.padding = '10px';
-    cartBox.style.borderRadius = '6px';
-    cartBox.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+    cartBox.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
     cartBox.style.zIndex = '1000';
     document.body.appendChild(cartBox);
 
@@ -47,6 +48,7 @@ fetch('data.json')
       const cartTd = document.createElement('td');
       const addBtn = document.createElement('button');
       addBtn.innerText = 'Add';
+      addBtn.style.cursor = 'pointer';
       addBtn.onclick = () => {
         const item = {
           description: row['description'] || 'n/a',
@@ -74,19 +76,17 @@ fetch('data.json')
     cartBtn.style.position = 'fixed';
     cartBtn.style.top = '20px';
     cartBtn.style.right = '20px';
-    cartBtn.style.padding = '8px 12px';
+    cartBtn.style.padding = '10px 15px';
     cartBtn.style.fontSize = '16px';
-    cartBtn.style.backgroundColor = '#007bff';
-    cartBtn.style.color = 'white';
-    cartBtn.style.border = 'none';
-    cartBtn.style.borderRadius = '4px';
     cartBtn.style.cursor = 'pointer';
+    cartBtn.style.borderRadius = '5px';
+    cartBtn.style.border = '1px solid #333';
+    cartBtn.style.backgroundColor = '#eee';
     document.body.appendChild(cartBtn);
 
-    cartBtn.onclick = (e) => {
+    cartBtn.onclick = () => {
       cartBox.style.display = cartBox.style.display === 'none' ? 'block' : 'none';
       updateCart();
-      e.stopPropagation();
     };
 
     document.addEventListener('click', (e) => {
@@ -97,41 +97,88 @@ fetch('data.json')
 
     function updateCart() {
       cartBox.innerHTML = '<h3>Cart</h3>';
+
+      if (cart.length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.innerText = 'Cart is empty.';
+        cartBox.appendChild(emptyMsg);
+        return;
+      }
+
       let total = 0;
+
       cart.forEach((item, idx) => {
         const itemDiv = document.createElement('div');
+        itemDiv.style.display = 'flex';
+        itemDiv.style.alignItems = 'center';
+        itemDiv.style.justifyContent = 'space-between';
+        itemDiv.style.marginBottom = '8px';
+
+        const descSpan = document.createElement('span');
+        let descText = item.description.length > 20
+          ? item.description.slice(0, 20) + '...'
+          : item.description;
+        descSpan.innerText = descText;
+        descSpan.style.flex = '1';
+
+        const qtyInput = document.createElement('input');
+        qtyInput.type = 'number';
+        qtyInput.min = 1;
+        qtyInput.value = item.quantity;
+        qtyInput.style.width = '40px';
+        qtyInput.style.margin = '0 8px';
+        qtyInput.onchange = () => {
+          let val = parseInt(qtyInput.value);
+          if (isNaN(val) || val < 1) val = 1;
+          qtyInput.value = val;
+          cart[idx].quantity = val;
+          localStorage.setItem('cart', JSON.stringify(cart));
+          updateCart();
+        };
+
+        const priceSpan = document.createElement('span');
         const price = item.price * item.quantity;
-        total += price;
-        const desc = item.description.length > 20 ? item.description.slice(0, 20) + '...' : item.description;
-        itemDiv.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span>${desc}</span>
-            <span>$${price.toFixed(2)}</span>
-            <button onclick="removeFromCart(${idx})" style="margin-left: 10px; cursor: pointer;">✕</button>
-          </div>
-        `;
+        priceSpan.innerText = `$${price.toFixed(2)}`;
+        priceSpan.style.width = '60px';
+        priceSpan.style.textAlign = 'right';
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerText = 'Remove';
+        removeBtn.style.marginLeft = '8px';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.onclick = () => {
+          cart.splice(idx, 1);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          updateCart();
+        };
+
+        itemDiv.appendChild(descSpan);
+        itemDiv.appendChild(qtyInput);
+        itemDiv.appendChild(priceSpan);
+        itemDiv.appendChild(removeBtn);
         cartBox.appendChild(itemDiv);
+
+        total += price;
       });
+
       const tax = total * 0.05;
       const shipping = cart.length > 0 ? 10 : 0;
       const grandTotal = total + tax + shipping;
+
       const summary = document.createElement('div');
+      summary.style.borderTop = '1px solid #ccc';
+      summary.style.paddingTop = '10px';
+      summary.style.marginTop = '10px';
+      summary.style.fontSize = '14px';
+
       summary.innerHTML = `
-        <hr>
         <div>Subtotal: $${total.toFixed(2)}</div>
         <div>Tax (5%): $${tax.toFixed(2)}</div>
         <div>Shipping: $${shipping.toFixed(2)}</div>
         <strong>Total: $${grandTotal.toFixed(2)}</strong>
       `;
       cartBox.appendChild(summary);
-      localStorage.setItem('cart', JSON.stringify(cart));
     }
-
-    window.removeFromCart = (index) => {
-      cart.splice(index, 1);
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCart();
-    };
 
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
@@ -152,6 +199,7 @@ fetch('data.json')
       note.style.color = 'white';
       note.style.padding = '10px';
       note.style.borderRadius = '5px';
+      note.style.zIndex = '1100';
       document.body.appendChild(note);
       setTimeout(() => document.body.removeChild(note), 2000);
     }
