@@ -1,6 +1,8 @@
+let filterContainer;
+
 export function initFilters(data, table) {
   const uniqueBrands = [...new Set(data.map(d => d['brand']).filter(Boolean))];
-  const filterContainer = document.createElement('div');
+  filterContainer = document.createElement('div');
   filterContainer.style.marginBottom = '10px';
 
   uniqueBrands.forEach(brand => {
@@ -25,3 +27,7 @@ export function initFilters(data, table) {
     }
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Optionally, call initFilters here if you want auto init with global variables
+});
