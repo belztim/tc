@@ -1,5 +1,3 @@
-document.addEventListener('DOMContentLoaded', () => {
-
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let cartBox, cartBtn, tableData;
 
@@ -56,7 +54,6 @@ export function initCart(data) {
 }
 
 function attachAddButtons() {
-  // Attach 'Add' buttons inside table cells with class 'cart-cell'
   document.querySelectorAll('#data-table td.cart-cell').forEach((td, idx) => {
     td.innerHTML = ''; // Clear before adding
     const addBtn = document.createElement('button');
@@ -172,4 +169,10 @@ function updateCart() {
   `;
   cartBox.appendChild(summary);
 }
+
+// If you want to do some setup on DOM ready you can do this:
+document.addEventListener('DOMContentLoaded', () => {
+  // You can optionally auto-init here or do nothing
+  // For example:
+  // initCart(yourDataHere);
 });
