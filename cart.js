@@ -17,23 +17,24 @@ export function initCart(data) {
 
   cartBox = document.createElement('div');
   cartBox.id = 'cart-box';
-  Object.assign(cartBox.style, {
-    display: 'none',
-    position: 'fixed',
-    top: '60px',
-    right: '20px',
-    width: '380px',         // wider cart box
-    maxHeight: '500px',     // taller for better scroll
-    overflowY: 'auto',
-    backgroundColor: '#fff',
-    borderRadius: '8px',
-    border: '1px solid #ddd',
-    padding: '15px',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-    zIndex: '1000',
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    color: '#333',
-  });
+Object.assign(cartBox.style, {
+  display: 'none',
+  position: 'fixed',
+  top: '60px',
+  right: '20px',
+  width: '320px',
+  maxHeight: '450px',
+  overflowY: 'auto',
+  backgroundColor: '#fff',
+  borderRadius: '8px',
+  border: '1px solid #ddd',
+  padding: '15px',
+  boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+  zIndex: '1000',
+  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+  color: '#333',
+  boxSizing: 'border-box',  // Add this line
+});
   document.body.appendChild(cartBox);
 
   cartBtn = document.createElement('button');
