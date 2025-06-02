@@ -5,13 +5,9 @@ fetch('data.json')
     const table = document.getElementById('data-table');
     if (!data.length) return;
 
-    // Filter headers (case-insensitive)
     const headers = Object.keys(data[0]).filter(h => !excludedCols.includes(h.toLowerCase()));
-
-    // Add a header for "Add to Cart" button
     headers.push('Add to Cart');
 
-    // Create header row
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
       const th = document.createElement('th');
@@ -20,14 +16,10 @@ fetch('data.json')
     });
     table.appendChild(headerRow);
 
-    // Cart object to store added items
     const cart = {};
 
-    // Create data rows with unique IDs
     data.forEach((row, index) => {
       const tr = document.createElement('tr');
-
-      // Use index to guarantee unique ID
       tr.id = `row-${index}`;
 
       headers.forEach(header => {
@@ -38,10 +30,9 @@ fetch('data.json')
           btn.innerText = 'Add';
           btn.style.cursor = 'pointer';
           btn.addEventListener('click', () => {
-            // Add item to cart
             const key = row['part number'] || row['Part Number'] || row['number'] || index;
             cart[key] = row;
-            showToast(`Added ${row['part name'] || row['Part Name'] || 'item'} to cart.`);
+            showToast(`Added item to cart.`);
             updateCartCount();
           });
           td.appendChild(btn);
@@ -53,7 +44,6 @@ fetch('data.json')
       table.appendChild(tr);
     });
 
-    // Search functionality
     const searchInput = document.getElementById('search-input');
     const searchBtn = document.getElementById('search-btn');
 
@@ -68,9 +58,8 @@ fetch('data.json')
 
       clearHighlights();
 
-      // Search through rows
       let foundRow = null;
-      for (let i = 1; i < table.rows.length; i++) { // skip header row
+      for (let i = 1; i < table.rows.length; i++) {
         const cells = table.rows[i].cells;
         for (let cell of cells) {
           if (cell.innerText.toLowerCase().includes(query)) {
@@ -82,22 +71,20 @@ fetch('data.json')
       }
 
       if (foundRow) {
-        foundRow.style.backgroundColor = '#ffff99'; // highlight
+        foundRow.style.backgroundColor = '#ffff99';
         foundRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         showToast('No matching part found.');
       }
     });
 
-    // Trigger search on Enter key
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        e.preventDefault();  // prevent default
+        e.preventDefault();
         searchBtn.click();
       }
     });
 
-    // Toast notification function
     function showToast(message) {
       let toast = document.getElementById('toast');
       if (!toast) {
@@ -122,9 +109,8 @@ fetch('data.json')
       }, 2000);
     }
 
-    // Cart popup and button setup
     const cartBtn = document.createElement('button');
-    cartBtn.innerText = 'View Cart (0)';
+    cartBtn.innerText = '🛒 View Cart (0)';
     cartBtn.id = 'cart-btn';
     cartBtn.style.position = 'fixed';
     cartBtn.style.top = '20px';
@@ -132,6 +118,11 @@ fetch('data.json')
     cartBtn.style.padding = '10px 15px';
     cartBtn.style.zIndex = '1001';
     cartBtn.style.cursor = 'pointer';
+    cartBtn.style.background = '#007BFF';
+    cartBtn.style.color = '#fff';
+    cartBtn.style.border = 'none';
+    cartBtn.style.borderRadius = '6px';
+    cartBtn.style.fontSize = '15px';
     document.body.appendChild(cartBtn);
 
     const cartPopup = document.createElement('div');
@@ -148,13 +139,21 @@ fetch('data.json')
     cartPopup.style.padding = '10px';
     cartPopup.style.display = 'none';
     cartPopup.style.zIndex = '1002';
+    cartPopup.style.borderRadius = '6px';
     document.body.appendChild(cartPopup);
 
-    cartBtn.addEventListener('click', () => {
+    cartBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       if (cartPopup.style.display === 'none') {
         renderCart();
         cartPopup.style.display = 'block';
       } else {
+        cartPopup.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!cartPopup.contains(e.target) && e.target !== cartBtn) {
         cartPopup.style.display = 'none';
       }
     });
@@ -169,20 +168,20 @@ fetch('data.json')
 
       keys.forEach(key => {
         const item = cart[key];
+        const description = (item['description'] || item['Description'] || 'Unnamed item').slice(0, 20);
         const div = document.createElement('div');
         div.style.borderBottom = '1px solid #ddd';
         div.style.padding = '5px 0';
-        div.innerText = `${item['part name'] || item['Part Name'] || 'Item'} - ${item['part number'] || item['Part Number'] || 'N/A'}`;
+        div.innerText = description;
         cartPopup.appendChild(div);
       });
     }
 
     function updateCartCount() {
       const count = Object.keys(cart).length;
-      cartBtn.innerText = `View Cart (${count})`;
+      cartBtn.innerText = `🛒 View Cart (${count})`;
     }
   })
   .catch(error => {
     console.error('Error loading JSON:', error);
   });
-
