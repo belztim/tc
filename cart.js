@@ -4,6 +4,17 @@ let cartBox, cartBtn, tableData;
 export function initCart(data) {
   tableData = data;
 
+  // Shift the data table left with margin so cart fits on the right
+  const table = document.getElementById('data-table');
+  if (table) {
+    Object.assign(table.style, {
+      marginRight: '400px', // enough space for wider cart
+      marginLeft: '20px',
+      maxWidth: 'calc(100% - 420px)',
+      overflowX: 'auto',
+    });
+  }
+
   cartBox = document.createElement('div');
   cartBox.id = 'cart-box';
   Object.assign(cartBox.style, {
@@ -11,8 +22,8 @@ export function initCart(data) {
     position: 'fixed',
     top: '60px',
     right: '20px',
-    width: '320px',
-    maxHeight: '450px',
+    width: '380px',         // wider cart box
+    maxHeight: '500px',     // taller for better scroll
     overflowY: 'auto',
     backgroundColor: '#fff',
     borderRadius: '8px',
@@ -91,7 +102,7 @@ function attachAddButtons() {
     };
 
     addBtn.onclick = (e) => {
-      e.stopPropagation(); // Prevent cart close on Add button click
+      e.stopPropagation();
 
       const rowData = tableData[idx];
       const item = {
@@ -108,7 +119,6 @@ function attachAddButtons() {
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
 
-      // Keep cart open after adding an item
       cartBox.style.display = 'block';
     };
 
@@ -149,8 +159,8 @@ function updateCart() {
     });
 
     const descSpan = document.createElement('span');
-    let descText = item.description.length > 25
-      ? item.description.slice(0, 25) + '...'
+    let descText = item.description.length > 40
+      ? item.description.slice(0, 40) + '...'
       : item.description;
     descSpan.innerText = descText;
     descSpan.style.flex = '1';
@@ -176,7 +186,7 @@ function updateCart() {
       cart[idx].quantity = val;
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      cartBox.style.display = 'block'; // Keep cart open after qty change
+      cartBox.style.display = 'block';
     };
 
     const priceSpan = document.createElement('span');
@@ -213,11 +223,11 @@ function updateCart() {
     removeBtn.onmouseleave = () => removeBtn.style.backgroundColor = '#ff5252';
 
     removeBtn.onclick = (e) => {
-      e.stopPropagation(); // Prevent closing cart on remove
+      e.stopPropagation();
       cart.splice(idx, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      cartBox.style.display = 'block'; // Keep cart open after remove
+      cartBox.style.display = 'block';
     };
 
     itemDiv.appendChild(descSpan);
@@ -254,6 +264,5 @@ function updateCart() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Optional auto-init here
-  // initCart(yourDataHere);
+  // initCart(yourDataHere); // call with your data array
 });
