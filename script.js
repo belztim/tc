@@ -5,21 +5,29 @@ fetch('data.json')
     const table = document.getElementById('data-table');
     if (!data.length) return;
 
+    // Filter headers (case-insensitive)
     const headers = Object.keys(data[0]).filter(h => !excludedCols.includes(h.toLowerCase()));
+
+    // Add a header for "Add to Cart" button
     headers.push('Add to Cart');
 
+    // Create header row
     const headerRow = document.createElement('tr');
     headers.forEach(header => {
       const th = document.createElement('th');
-      th.innerText = header === 'Add to Cart' ? '' : header;
+      th.innerText = header;
       headerRow.appendChild(th);
     });
     table.appendChild(headerRow);
 
-    const cart = [];
+    // Cart object to store added items
+    const cart = {};
 
+    // Create data rows with unique IDs
     data.forEach((row, index) => {
       const tr = document.createElement('tr');
+
+      // Use index to guarantee unique ID
       tr.id = `row-${index}`;
 
       headers.forEach(header => {
@@ -27,132 +35,23 @@ fetch('data.json')
 
         if (header === 'Add to Cart') {
           const btn = document.createElement('button');
-          btn.innerText = 'Add to Cart';
+          btn.innerText = 'Add';
           btn.style.cursor = 'pointer';
           btn.addEventListener('click', () => {
-            cart.push(row);
+            // Add item to cart
+            const key = row['part number'] || row['Part Number'] || row['number'] || index;
+            cart[key] = row;
+            showToast(`Added ${row['part name'] || row['Part Name'] || 'item'} to cart.`);
             updateCartCount();
-            showToast(`Added "${row['part name'] || row['Part Name'] || 'item'}" to cart!`);
-            updateCartView();
           });
           td.appendChild(btn);
         } else {
-          td.innerText = row[header] || '';
+          td.innerText = row[header];
         }
-
         tr.appendChild(td);
       });
       table.appendChild(tr);
     });
-
-    // Cart display (top-right) with button to toggle cart popup
-    const cartDiv = document.createElement('div');
-    cartDiv.id = 'cart-display';
-    cartDiv.style.position = 'fixed';
-    cartDiv.style.top = '10px';
-    cartDiv.style.right = '10px';
-    cartDiv.style.backgroundColor = '#2980b9';
-    cartDiv.style.color = 'white';
-    cartDiv.style.padding = '10px 15px';
-    cartDiv.style.borderRadius = '5px';
-    cartDiv.style.fontWeight = 'bold';
-    cartDiv.style.cursor = 'pointer';
-    cartDiv.title = 'Click to view cart';
-    cartDiv.innerHTML = `Cart: <span id="cart-count">0</span> items`;
-    document.body.appendChild(cartDiv);
-
-    // Cart popup container (hidden by default)
-    const cartPopup = document.createElement('div');
-    cartPopup.id = 'cart-popup';
-    Object.assign(cartPopup.style, {
-      position: 'fixed',
-      top: '50px',
-      right: '10px',
-      width: '300px',
-      maxHeight: '400px',
-      overflowY: 'auto',
-      backgroundColor: 'white',
-      border: '2px solid #2980b9',
-      borderRadius: '8px',
-      padding: '10px',
-      boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-      display: 'none',
-      zIndex: '9999',
-    });
-    document.body.appendChild(cartPopup);
-
-    // Close button for cart popup
-    const closeBtn = document.createElement('button');
-    closeBtn.innerText = 'Close';
-    closeBtn.style.marginBottom = '10px';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.addEventListener('click', () => {
-      cartPopup.style.display = 'none';
-    });
-    cartPopup.appendChild(closeBtn);
-
-    // Container inside popup to hold cart items list
-    const cartItemsList = document.createElement('div');
-    cartPopup.appendChild(cartItemsList);
-
-    // Update cart count
-    function updateCartCount() {
-      const cartCount = document.getElementById('cart-count');
-      if (cartCount) cartCount.innerText = cart.length;
-    }
-
-    // Update cart popup content
-    function updateCartView() {
-      cartItemsList.innerHTML = '';
-      if (cart.length === 0) {
-        cartItemsList.innerHTML = '<p>Your cart is empty.</p>';
-        return;
-      }
-      cart.forEach((item, idx) => {
-        const div = document.createElement('div');
-        div.style.borderBottom = '1px solid #ddd';
-        div.style.padding = '5px 0';
-        div.innerText = `${item['part name'] || item['Part Name'] || 'Item'} - ${item['part number'] || item['Part Number'] || ''}`;
-        cartItemsList.appendChild(div);
-      });
-    }
-
-    // Toggle cart popup on cartDiv click
-    cartDiv.addEventListener('click', () => {
-      if (cartPopup.style.display === 'none') {
-        updateCartView();
-        cartPopup.style.display = 'block';
-      } else {
-        cartPopup.style.display = 'none';
-      }
-    });
-
-    // Toast popup for messages
-    const toast = document.createElement('div');
-    toast.id = 'toast-popup';
-    Object.assign(toast.style, {
-      position: 'fixed',
-      bottom: '30px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      backgroundColor: '#333',
-      color: 'white',
-      padding: '10px 20px',
-      borderRadius: '5px',
-      opacity: '0',
-      transition: 'opacity 0.5s ease',
-      pointerEvents: 'none',
-      zIndex: '10000',
-    });
-    document.body.appendChild(toast);
-
-    function showToast(message) {
-      toast.textContent = message;
-      toast.style.opacity = '1';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-      }, 2000);
-    }
 
     // Search functionality
     const searchInput = document.getElementById('search-input');
@@ -169,8 +68,9 @@ fetch('data.json')
 
       clearHighlights();
 
+      // Search through rows
       let foundRow = null;
-      for (let i = 1; i < table.rows.length; i++) {
+      for (let i = 1; i < table.rows.length; i++) { // skip header row
         const cells = table.rows[i].cells;
         for (let cell of cells) {
           if (cell.innerText.toLowerCase().includes(query)) {
@@ -182,19 +82,105 @@ fetch('data.json')
       }
 
       if (foundRow) {
-        foundRow.style.backgroundColor = '#ffff99';
+        foundRow.style.backgroundColor = '#ffff99'; // highlight
         foundRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         showToast('No matching part found.');
       }
     });
 
+    // Trigger search on Enter key
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        e.preventDefault();
+        e.preventDefault();  // prevent default
         searchBtn.click();
       }
     });
+
+    // Toast notification function
+    function showToast(message) {
+      let toast = document.getElementById('toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast';
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.right = '20px';
+        toast.style.backgroundColor = '#333';
+        toast.style.color = '#fff';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '5px';
+        toast.style.opacity = '0.9';
+        toast.style.zIndex = '1000';
+        toast.style.transition = 'opacity 0.5s ease-in-out';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = message;
+      toast.style.opacity = '0.9';
+      setTimeout(() => {
+        toast.style.opacity = '0';
+      }, 2000);
+    }
+
+    // Cart popup and button setup
+    const cartBtn = document.createElement('button');
+    cartBtn.innerText = 'View Cart (0)';
+    cartBtn.id = 'cart-btn';
+    cartBtn.style.position = 'fixed';
+    cartBtn.style.top = '20px';
+    cartBtn.style.right = '20px';
+    cartBtn.style.padding = '10px 15px';
+    cartBtn.style.zIndex = '1001';
+    cartBtn.style.cursor = 'pointer';
+    document.body.appendChild(cartBtn);
+
+    const cartPopup = document.createElement('div');
+    cartPopup.id = 'cart-popup';
+    cartPopup.style.position = 'fixed';
+    cartPopup.style.top = '60px';
+    cartPopup.style.right = '20px';
+    cartPopup.style.width = '300px';
+    cartPopup.style.maxHeight = '400px';
+    cartPopup.style.overflowY = 'auto';
+    cartPopup.style.backgroundColor = '#fff';
+    cartPopup.style.border = '1px solid #ddd';
+    cartPopup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    cartPopup.style.padding = '10px';
+    cartPopup.style.display = 'none';
+    cartPopup.style.zIndex = '1002';
+    document.body.appendChild(cartPopup);
+
+    cartBtn.addEventListener('click', () => {
+      if (cartPopup.style.display === 'none') {
+        renderCart();
+        cartPopup.style.display = 'block';
+      } else {
+        cartPopup.style.display = 'none';
+      }
+    });
+
+    function renderCart() {
+      cartPopup.innerHTML = '<h3>Cart Items</h3>';
+      const keys = Object.keys(cart);
+      if (!keys.length) {
+        cartPopup.innerHTML += '<p>Your cart is empty.</p>';
+        return;
+      }
+
+      keys.forEach(key => {
+        const item = cart[key];
+        const div = document.createElement('div');
+        div.style.borderBottom = '1px solid #ddd';
+        div.style.padding = '5px 0';
+        div.innerText = `${item['part name'] || item['Part Name'] || 'Item'} - ${item['part number'] || item['Part Number'] || 'N/A'}`;
+        cartPopup.appendChild(div);
+      });
+    }
+
+    function updateCartCount() {
+      const count = Object.keys(cart).length;
+      cartBtn.innerText = `View Cart (${count})`;
+    }
   })
   .catch(error => {
     console.error('Error loading JSON:', error);
