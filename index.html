@@ -2,37 +2,39 @@
 <html>
 <head>
   <style>
-  body {
-  font-family: Arial, sans-serif;
-  max-width: 900px;
-  margin: 30px auto;      /* centers the container horizontally */
-  background: #f9f9f9;
-  color: #333;
-  padding: 20px;
-  box-sizing: border-box; /* makes padding included in width */
-}
-  }
-  h1 {
-    color: #2c3e50;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 20px;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-  }
-  th {
-    background: #2980b9;
-    color: white;
-  }
-  tr:nth-child(even) {
-    background: #f2f2f2;
-  }
-</style>
-
+    /* Apply box-sizing to all elements for better sizing */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 30px auto; /* center horizontally */
+      background: #f9f9f9;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #2980b9;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+  </style>
   <title>Excel Data Viewer</title>
 </head>
 <body>
@@ -40,13 +42,12 @@
   <table id="data-table" border="1"></table>
 
   <script>
-    // Load data from data.json
     fetch('data.json')
       .then(response => response.json())
       .then(data => {
         const table = document.getElementById('data-table');
-        
-        if (data.length === 0) return;
+
+        if (!data.length) return;
 
         // Create table headers
         const headers = Object.keys(data[0]);
@@ -68,6 +69,9 @@
           });
           table.appendChild(tr);
         });
+      })
+      .catch(error => {
+        console.error('Error loading JSON:', error);
       });
   </script>
 </body>
