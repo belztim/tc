@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', () => {
+
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 let cartBox, cartBtn, tableData;
 
@@ -170,3 +172,4 @@ function updateCart() {
   `;
   cartBox.appendChild(summary);
 }
+});
