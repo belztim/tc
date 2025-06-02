@@ -75,6 +75,7 @@ function attachAddButtons() {
       }
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
+      cartBox.style.display = 'block'; // Keep cart open after add
     };
 
     td.appendChild(addBtn);
@@ -122,6 +123,7 @@ function updateCart() {
       cart[idx].quantity = val;
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
+      cartBox.style.display = 'block'; // Keep cart open after qty change
     };
 
     const priceSpan = document.createElement('span');
@@ -134,10 +136,12 @@ function updateCart() {
     removeBtn.innerText = 'Remove';
     removeBtn.style.marginLeft = '8px';
     removeBtn.style.cursor = 'pointer';
-    removeBtn.onclick = () => {
+    removeBtn.onclick = (e) => {
+      e.stopPropagation(); // Prevent closing cart on remove
       cart.splice(idx, 1);
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
+      cartBox.style.display = 'block'; // Keep cart open after remove
     };
 
     itemDiv.appendChild(descSpan);
@@ -176,3 +180,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // For example:
   // initCart(yourDataHere);
 });
+
