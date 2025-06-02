@@ -94,12 +94,12 @@
     fetch('data.json')
       .then(response => response.json())
       .then(data => {
-        const excludedCols = ['cost', 'supplier', 'department', 'date', 'markup', 'UoM'];
+        const excludedCols = ['cost', 'supplier', 'department', 'date', 'markup', 'UoM'].map(c => c.toLowerCase());
         const table = document.getElementById('data-table');
         if (!data.length) return;
 
-        // Filter headers to exclude unwanted columns
-        const headers = Object.keys(data[0]).filter(h => !excludedCols.includes(h));
+        // Filter headers to exclude unwanted columns (case-insensitive)
+        const headers = Object.keys(data[0]).filter(h => !excludedCols.includes(h.toLowerCase()));
 
         // Create table headers
         const headerRow = document.createElement('tr');
@@ -127,3 +127,4 @@
   </script>
 </body>
 </html>
+
