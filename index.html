@@ -10,16 +10,9 @@
       font-family: Arial, sans-serif;
       background: #f9f9f9;
       color: #333;
-      padding: 30px 20px; /* top-bottom and left-right padding */
       margin: 0;
-    }
-    .container {
-      max-width: 900px;
-      margin: 0;  /* no centering */
-      background: #fff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100vw;
     }
     h1 {
       color: #2c3e50;
@@ -46,10 +39,8 @@
   <title>Excel Data Viewer</title>
 </head>
 <body>
-  <div class="container">
-    <h1>Excel Data</h1>
-    <table id="data-table" border="1"></table>
-  </div>
+  <h1>Excel Data</h1>
+  <table id="data-table" border="1"></table>
 
   <script>
     fetch('data.json')
