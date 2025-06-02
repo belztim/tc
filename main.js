@@ -2,7 +2,7 @@ console.log('main.js loaded');
 import { buildTable } from './table.js';
 import { initCart } from './cart.js';
 import { initSearch } from './search.js';
-import { initFilters } from './filters.js';
+import { initFilters } from './filter.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   fetch('data.json')
