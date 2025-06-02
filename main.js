@@ -1,3 +1,4 @@
+console.log('main.js loaded');
 import { buildTable } from './table.js';
 import { initCart } from './cart.js';
 import { initSearch } from './search.js';
