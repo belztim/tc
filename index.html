@@ -94,11 +94,14 @@
     fetch('data.json')
       .then(response => response.json())
       .then(data => {
+        const excludedCols = ['cost', 'supplier', 'department', 'date', 'markup', 'UoM'];
         const table = document.getElementById('data-table');
         if (!data.length) return;
 
+        // Filter headers to exclude unwanted columns
+        const headers = Object.keys(data[0]).filter(h => !excludedCols.includes(h));
+
         // Create table headers
-        const headers = Object.keys(data[0]);
         const headerRow = document.createElement('tr');
         headers.forEach(header => {
           const th = document.createElement('th');
@@ -107,7 +110,7 @@
         });
         table.appendChild(headerRow);
 
-        // Create table rows
+        // Create table rows with filtered columns
         data.forEach(row => {
           const tr = document.createElement('tr');
           headers.forEach(header => {
@@ -124,5 +127,3 @@
   </script>
 </body>
 </html>
-
-
