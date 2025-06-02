@@ -4,37 +4,45 @@ let cartBox, cartBtn, tableData;
 export function initCart(data) {
   tableData = data;
 
-  // Shift the data table left with margin so cart fits on the right
+  const tableWrapper = document.getElementById('table-wrapper');
+  if (tableWrapper) {
+    Object.assign(tableWrapper.style, {
+      paddingLeft: '20px',
+      paddingRight: '20px',
+      boxSizing: 'border-box',
+      background: 'white',
+    });
+  }
+
   const table = document.getElementById('data-table');
   if (table) {
     Object.assign(table.style, {
-      marginRight: '400px', // enough space for wider cart
-      marginLeft: '20px',
-      maxWidth: 'calc(100% - 420px)',
+      marginRight: '400px', // space for cart
+      maxWidth: '100%',
       overflowX: 'auto',
     });
   }
 
   cartBox = document.createElement('div');
   cartBox.id = 'cart-box';
-Object.assign(cartBox.style, {
-  display: 'none',
-  position: 'fixed',
-  top: '60px',
-  right: '20px',
-  width: '320px',
-  maxHeight: '450px',
-  overflowY: 'auto',
-  backgroundColor: '#fff',
-  borderRadius: '8px',
-  border: '1px solid #ddd',
-  padding: '15px',
-  boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-  zIndex: '1000',
-  fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-  color: '#333',
-  boxSizing: 'border-box',  // Add this line
-});
+  Object.assign(cartBox.style, {
+    display: 'none',
+    position: 'fixed',
+    top: '60px',
+    right: '20px',
+    width: '320px',
+    maxHeight: '450px',
+    overflowY: 'auto',
+    backgroundColor: '#fff',
+    borderRadius: '8px',
+    border: '1px solid #ddd',
+    padding: '15px',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
+    zIndex: '1000',
+    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    color: '#333',
+    boxSizing: 'border-box',
+  });
   document.body.appendChild(cartBox);
 
   cartBtn = document.createElement('button');
@@ -75,7 +83,7 @@ Object.assign(cartBox.style, {
 
 function attachAddButtons() {
   document.querySelectorAll('#data-table td.cart-cell').forEach((td, idx) => {
-    td.innerHTML = ''; // Clear before adding
+    td.innerHTML = '';
     const addBtn = document.createElement('button');
     addBtn.innerText = 'Add';
     Object.assign(addBtn.style, {
@@ -104,7 +112,6 @@ function attachAddButtons() {
 
     addBtn.onclick = (e) => {
       e.stopPropagation();
-
       const rowData = tableData[idx];
       const item = {
         description: rowData['Description'] || 'n/a',
@@ -119,7 +126,6 @@ function attachAddButtons() {
       }
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-
       cartBox.style.display = 'block';
     };
 
@@ -265,5 +271,6 @@ function updateCart() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // initCart(yourDataHere); // call with your data array
+  // initCart(yourDataHere);
 });
+
