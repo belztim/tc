@@ -60,7 +60,9 @@ function attachAddButtons() {
     addBtn.innerText = 'Add';
     addBtn.style.cursor = 'pointer';
 
-    addBtn.onclick = () => {
+    addBtn.onclick = (e) => {
+      e.stopPropagation(); // Prevent cart close on Add button click
+
       const rowData = tableData[idx];
       const item = {
         description: rowData['Description'] || 'n/a',
@@ -182,4 +184,3 @@ document.addEventListener('DOMContentLoaded', () => {
   // For example:
   // initCart(yourDataHere);
 });
-
