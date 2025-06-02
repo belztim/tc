@@ -17,11 +17,18 @@ fetch('data.json')
     });
     table.appendChild(headerRow);
 
-    // Create data rows with an id for scrolling
+    // Create data rows with unique IDs
     data.forEach((row, index) => {
       const tr = document.createElement('tr');
-      // Add an id to each row for scroll targeting (use part number or index fallback)
+
+      // Create a simple unique ID based on part name or part number (first match)
+      // Adjust the keys if your JSON keys differ
+      const partName = row['part name'] || row['Part Name'] || row['name'] || '';
+      const partNumber = row['part number'] || row['Part Number'] || row['number'] || '';
+
+      // Use index to guarantee unique ID
       tr.id = `row-${index}`;
+
       headers.forEach(header => {
         const td = document.createElement('td');
         td.innerText = row[header];
@@ -30,42 +37,49 @@ fetch('data.json')
       table.appendChild(tr);
     });
 
-    // Search function
-    function searchTable() {
-      const input = document.getElementById('search-input').value.trim().toLowerCase();
-      if (!input) return;
+    // Search functionality
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('search-btn');
 
-      // Find the index of part name or part number columns
-      const partNameColIndex = headers.findIndex(h => h.toLowerCase().includes('part name'));
-      const partNumColIndex = headers.findIndex(h => h.toLowerCase().includes('part number') || h.toLowerCase().includes('part no'));
-
-      for (let i = 0; i < data.length; i++) {
-        const partName = data[i][headers[partNameColIndex]]?.toLowerCase() || '';
-        const partNum = data[i][headers[partNumColIndex]]?.toLowerCase() || '';
-
-        if (partName.includes(input) || partNum.includes(input)) {
-          const row = document.getElementById(`row-${i}`);
-          if (row) {
-            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Optional: highlight found row briefly
-            row.style.backgroundColor = '#ffff99';
-            setTimeout(() => {
-              row.style.backgroundColor = '';
-            }, 2000);
-          }
-          return; // Stop after first match
-        }
-      }
-
-      alert('No matching part name or part number found.');
+    function clearHighlights() {
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(r => r.style.backgroundColor = '');
     }
 
-    // Attach event listener to search button
-    document.getElementById('search-btn').addEventListener('click', searchTable);
+    searchBtn.addEventListener('click', () => {
+      const query = searchInput.value.trim().toLowerCase();
+      if (!query) return;
 
-    // Optional: also trigger search on Enter key
-    document.getElementById('search-input').addEventListener('keydown', e => {
-      if (e.key === 'Enter') searchTable();
+      clearHighlights();
+
+      // Search through rows
+      let foundRow = null;
+      for (let i = 1; i < table.rows.length; i++) { // skip header row (index 0)
+        const cells = table.rows[i].cells;
+        // Assuming part name and part number are among visible columns, check each cell
+        for (let cell of cells) {
+          if (cell.innerText.toLowerCase().includes(query)) {
+            foundRow = table.rows[i];
+            break;
+          }
+        }
+        if (foundRow) break;
+      }
+
+      if (foundRow) {
+        // Highlight and scroll into view
+        foundRow.style.backgroundColor = '#ffff99'; // highlight color
+        foundRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        alert('No matching part found.');
+      }
+    });
+
+    // Optional: trigger search on Enter key press
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        searchBtn.click();
+      }
     });
   })
   .catch(error => {
