@@ -21,11 +21,6 @@ fetch('data.json')
     data.forEach((row, index) => {
       const tr = document.createElement('tr');
 
-      // Create a simple unique ID based on part name or part number (first match)
-      // Adjust the keys if your JSON keys differ
-      const partName = row['part name'] || row['Part Name'] || row['name'] || '';
-      const partNumber = row['part number'] || row['Part Number'] || row['number'] || '';
-
       // Use index to guarantee unique ID
       tr.id = `row-${index}`;
 
@@ -54,9 +49,8 @@ fetch('data.json')
 
       // Search through rows
       let foundRow = null;
-      for (let i = 1; i < table.rows.length; i++) { // skip header row (index 0)
+      for (let i = 1; i < table.rows.length; i++) { // skip header row
         const cells = table.rows[i].cells;
-        // Assuming part name and part number are among visible columns, check each cell
         for (let cell of cells) {
           if (cell.innerText.toLowerCase().includes(query)) {
             foundRow = table.rows[i];
@@ -67,17 +61,17 @@ fetch('data.json')
       }
 
       if (foundRow) {
-        // Highlight and scroll into view
-        foundRow.style.backgroundColor = '#ffff99'; // highlight color
+        foundRow.style.backgroundColor = '#ffff99'; // highlight
         foundRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         alert('No matching part found.');
       }
     });
 
-    // Optional: trigger search on Enter key press
+    // Trigger search on Enter key
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
+        e.preventDefault();  // prevent any default behavior
         searchBtn.click();
       }
     });
