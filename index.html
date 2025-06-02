@@ -8,14 +8,22 @@
     }
     body {
       font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 30px auto; /* center horizontally */
       background: #f9f9f9;
       color: #333;
       padding: 20px;
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto; /* center horizontally */
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h1 {
       color: #2c3e50;
+      margin-top: 0;
     }
     table {
       border-collapse: collapse;
@@ -38,8 +46,10 @@
   <title>Excel Data Viewer</title>
 </head>
 <body>
-  <h1>Excel Data</h1>
-  <table id="data-table" border="1"></table>
+  <div class="container">
+    <h1>Excel Data</h1>
+    <table id="data-table" border="1"></table>
+  </div>
 
   <script>
     fetch('data.json')
