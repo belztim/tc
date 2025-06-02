@@ -75,7 +75,9 @@ function attachAddButtons() {
       }
       localStorage.setItem('cart', JSON.stringify(cart));
       updateCart();
-      cartBox.style.display = 'block'; // Keep cart open after add
+
+      // Keep cart open after adding an item
+      cartBox.style.display = 'block';
     };
 
     td.appendChild(addBtn);
